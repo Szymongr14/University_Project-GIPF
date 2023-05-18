@@ -3,4 +3,4 @@ project(GIPF)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(GIPF main.cpp Board.cpp Board.h)
+add_executable(GIPF main.cpp Board.cpp Board.h GameState.cpp GameState.h)

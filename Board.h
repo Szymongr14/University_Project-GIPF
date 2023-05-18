@@ -17,8 +17,19 @@ private:
 
 class Board {
 private:
-    vector<vector<Board>>  BoardField;
-    int size;
+    vector<vector<BoardField>>  Board_vector;
+    int size=0;
+public:
+    Board (int size)
+        :size(size), Board_vector(size*2-1, vector<BoardField>(size*2-1))
+    {
+    }
+
+    Board()= default;
+
+    void loadBoard(){
+    }
+
 
 };
 
