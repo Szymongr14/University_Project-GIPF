@@ -6,28 +6,28 @@
 #define GIPF_GAMESTATE_H
 #include <iostream>
 #include <string>
-
+#include "Board.h"
 
 class GameState {
 private:
-    int size,pices_which_trigger,total_white_pices,total_black_pices;
+    int size,pawns_which_trigger,total_white_pawns,total_black_pawns,white_pawns_left,black_pawns_left;
     bool isWhiteTurn;
+    Board board;
 public:
-    GameState(int size, int pices_which_trigger, int total_white_pices, int total_black_pices, bool isWhiteTurn)
-        :size(size),pices_which_trigger(pices_which_trigger),total_white_pices(total_white_pices),total_black_pices(total_black_pices),isWhiteTurn(isWhiteTurn)
+    GameState(int size, int pices_which_trigger, int total_white_pices, int total_black_pices, bool isWhiteTurn, int current_white_pices, int current_black_pices)
+        : size(size), pawns_which_trigger(pices_which_trigger), total_white_pawns(total_white_pices), total_black_pawns(total_black_pices), isWhiteTurn(isWhiteTurn), white_pawns_left(current_white_pices), black_pawns_left(current_black_pices)
     {
 
     }
 
     GameState()
-        :size(0),pices_which_trigger(0),total_white_pices(0),total_black_pices(0),isWhiteTurn(true)
+        : size(0), pawns_which_trigger(0), total_white_pawns(0), total_black_pawns(0), isWhiteTurn(true), white_pawns_left(0), black_pawns_left(0), board(1)
     {
-
     }
 
     void loadGameState(){
         char temp;
-        std::cin>>size>>pices_which_trigger>>total_white_pices>>total_black_pices;
+        std::cin >> size >> pawns_which_trigger >> total_white_pawns >> total_black_pawns >> white_pawns_left >> black_pawns_left;
         std::cin>>temp;
         if(temp=='W'){
             isWhiteTurn=true;
@@ -35,16 +35,24 @@ public:
         else{
             isWhiteTurn=false;
         }
+        board.setSize(size);
+        board.loadBoard();
     }
 
     void printGameState() const{
-        std::cout<<size<<" "<<pices_which_trigger<<" "<<total_white_pices<<" "<<total_black_pices<<" ";
+        std::cout << size << " " << pawns_which_trigger << " " << total_white_pawns << " " << total_black_pawns << " " << white_pawns_left << " " << black_pawns_left << " ";
         if(isWhiteTurn){
             std::cout<<"W"<<std::endl;
         }
         else{
             std::cout<<"B"<<std::endl;
         }
+        cout<<endl<<endl<<endl;
+        board.printBoard();
+    }
+
+    int getSize() const {
+        return size;
     }
 };
 

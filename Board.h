@@ -64,6 +64,12 @@ public:
         }
     }
 
+    void setSize(int size_value) {
+        this->size = size_value;
+        int board_size = 2 * size - 1;
+        Board_vector.resize(board_size, vector<BoardField>(board_size));
+    }
+
 
     void printBoard() const {
         int fixed_size = size-1;
