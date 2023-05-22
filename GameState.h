@@ -6,13 +6,14 @@
 #define GIPF_GAMESTATE_H
 #include <iostream>
 #include <string>
+#include <memory>
 #include "Board.h"
 
 class GameState {
 private:
     int size,pawns_which_trigger,total_white_pawns,total_black_pawns,white_pawns_left,black_pawns_left;
     bool isWhiteTurn;
-    Board board;
+    unique_ptr<Board> board;
 public:
     GameState(int size, int pices_which_trigger, int total_white_pices, int total_black_pices, bool isWhiteTurn, int current_white_pices, int current_black_pices)
         : size(size), pawns_which_trigger(pices_which_trigger), total_white_pawns(total_white_pices), total_black_pawns(total_black_pices), isWhiteTurn(isWhiteTurn), white_pawns_left(current_white_pices), black_pawns_left(current_black_pices)
@@ -21,8 +22,9 @@ public:
     }
 
     GameState()
-        : size(0), pawns_which_trigger(0), total_white_pawns(0), total_black_pawns(0), isWhiteTurn(true), white_pawns_left(0), black_pawns_left(0), board(1)
+        : size(0), pawns_which_trigger(0), total_white_pawns(0), total_black_pawns(0), isWhiteTurn(true), white_pawns_left(0), black_pawns_left(0), board(std::make_unique<Board>())
     {
+
     }
 
     void loadGameState(){
@@ -35,8 +37,16 @@ public:
         else{
             isWhiteTurn=false;
         }
-        board.setSize(size);
-        board.loadBoard();
+        board->setSize(size);
+
+        if(!board->loadBoard()){
+            cout<<"WRONG_BOARD_ROW_LENGTH"<<endl;
+        } else{
+            cout<<"OK"<<endl;
+        }
+
+
+
     }
 
     void printGameState() const{
@@ -48,7 +58,7 @@ public:
             std::cout<<"B"<<std::endl;
         }
         cout<<endl<<endl<<endl;
-        board.printBoard();
+        board->printBoard();
     }
 
     int getSize() const {

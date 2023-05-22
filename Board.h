@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <limits>
+
 using namespace std;
 
 struct HexCoords{
@@ -33,35 +35,59 @@ public:
     }
 
     Board()= default;
+    ~Board(){
+        Board_vector.clear();
+    };
 
-    void loadBoard() {
+    bool loadBoard() {
+        string line;
+        vector<char> row_vector;
+        bool is_valid = true;
         int fixed_size = size-1;
         int board_size = 2 * size - 1;
 
-        for (int r = 0; r < board_size; r++) {
-            int row_size = (2 * fixed_size + 1) - abs(fixed_size - r);
-
-            for (int q = 0; q < row_size; q++) {
-                cin >> Board_vector[r][q].sign;
-                Board_vector[r][q].used = true;
-
-                //handle coords
-                if(r<=size){
-                    Board_vector[r][q].hex_coords.x = 'a' + q;
-                    Board_vector[r][q].hex_coords.y = size - r +q;
+        for (int i = 0; i < board_size; i++) {
+            getline(cin >> ws, line);
+            for (char j : line) {
+                if(j!=' '){
+                    row_vector.push_back(j);
                 }
-                else if(r>size){
-                    Board_vector[r][q].hex_coords.x = 'a' + q;
-                    Board_vector[r][q].hex_coords.y = size - r;
-                }
+            }
+            line.clear();
+        }
 
-                if (Board_vector[r][q].sign == '_') {
-                    Board_vector[r][q].isEmpty = true;
-                } else if (Board_vector[r][q].sign == 'W' || Board_vector[r][q].sign == 'B') {
-                    Board_vector[r][q].isEmpty = false;
+        if(row_vector.size()!=3 * size * (size - 1) + 1){
+            is_valid=false;
+        }
+
+        if(is_valid){
+            for (int r = 0; r < board_size; r++) {
+                int row_size = (2 * fixed_size + 1) - abs(fixed_size - r);
+
+                for (int q = 0; q < row_size; q++) {
+                    Board_vector[r][q].sign = row_vector.back();
+                    row_vector.pop_back();
+                    Board_vector[r][q].used = true;
+
+                    //handle coords
+                    if(r<=size){
+                        Board_vector[r][q].hex_coords.x = 'a' + q;
+                        Board_vector[r][q].hex_coords.y = size - r +q;
+                    }
+                    else if(r>size){
+                        Board_vector[r][q].hex_coords.x = 'a' + q;
+                        Board_vector[r][q].hex_coords.y = size - r;
+                    }
+
+                    if (Board_vector[r][q].sign == '_') {
+                        Board_vector[r][q].isEmpty = true;
+                    } else if (Board_vector[r][q].sign == 'W' || Board_vector[r][q].sign == 'B') {
+                        Board_vector[r][q].isEmpty = false;
+                    }
                 }
             }
         }
+        return is_valid;
     }
 
     void setSize(int size_value) {

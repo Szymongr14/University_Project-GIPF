@@ -16,7 +16,6 @@ int main() {
         else if(command=="PRINT_BOARD"){
             gameState.printGameState();
         }
-
     }while(command!="QUIT" && command!="q");
     return 0;
 }
