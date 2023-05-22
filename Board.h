@@ -9,7 +9,7 @@
 #include <iostream>
 #include <limits>
 
-using namespace std;
+using std::cout, std::endl, std::cin, std::vector, std::string;
 
 struct HexCoords{
     char x;
@@ -35,32 +35,49 @@ public:
     }
 
     Board()= default;
-    ~Board(){
-        Board_vector.clear();
-    };
 
-    bool loadBoard() {
+    int loadBoard(int expected_white_pawns_left,int expected_black_pawns_left) {
         string line;
         vector<char> row_vector;
-        bool is_valid = true;
+        int message_to_user = 0;
+        //message to user:
+        // 0-BOARD_STATE_OK
+        // 1-WRONG_BOARD_ROW_LENGTH
+        // 2-WRONG_WHITE_PAWNS_NUMBER
+        // 3-WRONG_BLACK_PAWNS_NUMBER
         int fixed_size = size-1;
         int board_size = 2 * size - 1;
+        int expected_row_size = 3 * size * (size - 1) + 1;
+        int actual_white_pawns_left=0,actual_black_pawns_left=0;
 
         for (int i = 0; i < board_size; i++) {
-            getline(cin >> ws, line);
+            getline(cin >> std::ws, line);
             for (char j : line) {
                 if(j!=' '){
+                    if(j=='W'){
+                        actual_white_pawns_left++;
+                    }
+                    else if(j=='B'){
+                        actual_black_pawns_left++;
+                    }
                     row_vector.push_back(j);
                 }
             }
             line.clear();
         }
 
-        if(row_vector.size()!=3 * size * (size - 1) + 1){
-            is_valid=false;
+
+        if(actual_white_pawns_left!=expected_white_pawns_left){
+            message_to_user=2;
+        }
+        if(actual_black_pawns_left!=expected_black_pawns_left){
+            message_to_user=3;
+        }
+        if(row_vector.size()!=expected_row_size){
+            message_to_user=1;
         }
 
-        if(is_valid){
+        if(message_to_user==0){
             for (int r = 0; r < board_size; r++) {
                 int row_size = (2 * fixed_size + 1) - abs(fixed_size - r);
 
@@ -87,7 +104,7 @@ public:
                 }
             }
         }
-        return is_valid;
+        return message_to_user;
     }
 
     void setSize(int size_value) {
@@ -115,7 +132,7 @@ public:
                 }
                 cout << Board_vector[r][q].sign << " ";
             }
-            cout << endl;
+            cout << '\n';
         }
     }
 
@@ -137,7 +154,7 @@ public:
                 }
                 cout << Board_vector[r][q].hex_coords.x << Board_vector[r][q].hex_coords.y << " ";
             }
-            cout << endl;
+            cout << '\n';
         }
     }
 };

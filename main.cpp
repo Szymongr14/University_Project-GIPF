@@ -1,13 +1,13 @@
 #include <iostream>
 #include <string>
-using namespace std;
 #include "GameState.h"
+using std::cout, std::endl, std::cin,std::string;
 
 int main() {
     string command;
     GameState gameState;
     do{
-        cout<<"Type command: " <<endl;
+//        cout<<"Type command: " <<endl;
         cin>>command;
 
         if(command=="LOAD_GAME_BOARD"){

@@ -13,14 +13,8 @@ class GameState {
 private:
     int size,pawns_which_trigger,total_white_pawns,total_black_pawns,white_pawns_left,black_pawns_left;
     bool isWhiteTurn;
-    unique_ptr<Board> board;
+    std::unique_ptr<Board> board;
 public:
-    GameState(int size, int pices_which_trigger, int total_white_pices, int total_black_pices, bool isWhiteTurn, int current_white_pices, int current_black_pices)
-        : size(size), pawns_which_trigger(pices_which_trigger), total_white_pawns(total_white_pices), total_black_pawns(total_black_pices), isWhiteTurn(isWhiteTurn), white_pawns_left(current_white_pices), black_pawns_left(current_black_pices)
-    {
-
-    }
-
     GameState()
         : size(0), pawns_which_trigger(0), total_white_pawns(0), total_black_pawns(0), isWhiteTurn(true), white_pawns_left(0), black_pawns_left(0), board(std::make_unique<Board>())
     {
@@ -29,8 +23,8 @@ public:
 
     void loadGameState(){
         char temp;
-        std::cin >> size >> pawns_which_trigger >> total_white_pawns >> total_black_pawns >> white_pawns_left >> black_pawns_left;
-        std::cin>>temp;
+        cin >> size >> pawns_which_trigger >> total_white_pawns >> total_black_pawns >> white_pawns_left >> black_pawns_left;
+        cin>>temp;
         if(temp=='W'){
             isWhiteTurn=true;
         }
@@ -39,27 +33,34 @@ public:
         }
         board->setSize(size);
 
-        if(!board->loadBoard()){
-            cout<<"WRONG_BOARD_ROW_LENGTH"<<endl;
-        } else{
-            cout<<"OK"<<endl;
+        switch(board->loadBoard(total_white_pawns-white_pawns_left,total_black_pawns-black_pawns_left)){
+            case 0:
+                cout<<"BOARD_STATE_OK"<<endl;
+                break;
+            case 1:
+                cout<<"WRONG_BOARD_ROW_LENGTH"<<endl;
+                break;
+            case 2:
+                cout<<"WRONG_WHITE_PAWNS_NUMBER"<<endl;
+                break;
+            case 3:
+                cout<<"WRONG_BLACK_PAWNS_NUMBER"<<endl;
+                break;
         }
-
-
-
     }
 
     void printGameState() const{
-        std::cout << size << " " << pawns_which_trigger << " " << total_white_pawns << " " << total_black_pawns << " " << white_pawns_left << " " << black_pawns_left << " ";
+        cout << size << " " << pawns_which_trigger << " " << total_white_pawns << " " << total_black_pawns << " " << white_pawns_left << " " << black_pawns_left << " ";
         if(isWhiteTurn){
-            std::cout<<"W"<<std::endl;
+            cout<<"W"<<endl;
         }
         else{
-            std::cout<<"B"<<std::endl;
+            cout<<"B"<<endl;
         }
         cout<<endl<<endl<<endl;
         board->printBoard();
     }
+
 
     int getSize() const {
         return size;
