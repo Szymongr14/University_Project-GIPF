@@ -13,10 +13,10 @@ class GameState {
 private:
     int size,pawns_which_trigger,total_white_pawns,total_black_pawns,white_pawns_left,black_pawns_left;
     bool isWhiteTurn;
-    std::unique_ptr<Board> board;
+    Board * board;
 public:
     GameState()
-        : size(0), pawns_which_trigger(0), total_white_pawns(0), total_black_pawns(0), isWhiteTurn(true), white_pawns_left(0), black_pawns_left(0), board(std::make_unique<Board>())
+        : size(0), pawns_which_trigger(0), total_white_pawns(0), total_black_pawns(0), isWhiteTurn(true), white_pawns_left(0), black_pawns_left(0), board(new Board())
     {
 
     }
