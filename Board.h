@@ -12,8 +12,8 @@
 using std::cout, std::endl, std::cin, std::vector, std::string;
 
 struct HexCoords{
-    char x;
-    int y;
+    char x=0;
+    int y=0;
 };
 
 class BoardField{
@@ -87,13 +87,18 @@ public:
                     Board_vector[r][q].used = true;
 
                     //handle coords
-                    if(r<=size){
+                    if(r<size){
+
                         Board_vector[r][q].hex_coords.x = 'a' + q;
-                        Board_vector[r][q].hex_coords.y = size - r +q;
+                        if(q>=row_size-r){
+                            Board_vector[r][q].hex_coords.y = Board_vector[r][q-1].hex_coords.y;
+                        } else{
+                            Board_vector[r][q].hex_coords.y = size - r +q;
+                        }
                     }
-                    else if(r>size){
-                        Board_vector[r][q].hex_coords.x = 'a' + q;
-                        Board_vector[r][q].hex_coords.y = size - r;
+                    else if(r>=size){
+                        Board_vector[r][q].hex_coords.x = Board_vector[r-1][q+1].hex_coords.x;
+                        Board_vector[r][q].hex_coords.y = Board_vector[r-1][q+1].hex_coords.y-1;
                     }
 
                     if (Board_vector[r][q].sign == '_') {
@@ -136,7 +141,7 @@ public:
         }
     }
 
-    void printBoardWithCoords() const {
+    void printBoardAsCoords() const {
         int fixed_size = size-1;
         int board_size = 2 * size - 1;
         bool wasSpacing;
