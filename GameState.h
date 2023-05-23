@@ -21,10 +21,13 @@ public:
 
     }
 
+
+
     void loadGameState(){
         char temp;
         cin >> size >> pawns_which_trigger >> total_white_pawns >> total_black_pawns >> white_pawns_left >> black_pawns_left;
         cin>>temp;
+
         if(temp=='W'){
             isWhiteTurn=true;
         }
@@ -36,7 +39,6 @@ public:
         switch(board->loadBoard(total_white_pawns-white_pawns_left,total_black_pawns-black_pawns_left)){
             case 0:
                 cout<<"BOARD_STATE_OK"<<endl;
-//                board->assignCoords();
                 break;
             case 1:
                 cout<<"WRONG_BOARD_ROW_LENGTH"<<endl;
@@ -58,9 +60,12 @@ public:
         else{
             cout<<"B"<<endl;
         }
-        cout<<endl<<endl<<endl;
         board->printBoard();
-        board->printBoardAsCoords();
+//        board->printCOORDS();
+    }
+
+    Board* getBoard(){
+        return board;
     }
 };
 
