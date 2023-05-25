@@ -20,7 +20,7 @@ struct HexCoords{
 class BoardField{
 public:
     char sign;
-    bool isEmpty,used = false;
+    bool isEmpty,used,border = false;
     HexCoords hex_coords;
 };
 
@@ -45,6 +45,8 @@ public:
     void printCOORDS();
 
     bool isCoordsValid(char x, int y) const;
+    bool isBorder(char x, int y) const;
+    bool isDirectionValid(char x, int y, char x1, int y1) const;
 };
 
 

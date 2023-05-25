@@ -11,26 +11,23 @@ PRINT_GAME_BOARD
 
 DO_MOVE a1-f3
 
+DO_MOVE f3-e3
 
+DO_MOVE d5-d4
+
+DO_MOVE a1-c2
+
+DO_MOVE b2-c2
+
+DO_MOVE a1-b1
+
+LOAD_GAME_BOARD
 2 3 5 5
-1 2 B
-
-  * * * 
- * W B *  
-* W B W *  
- * W B *
-  * * *
-
-2 3 5 5        
 2 2 W
  W B
 B _ W
  W B
 
-a3 b4 c5 0 0   
-a2 b3 c4 d4 0  
-a1 b2 c3 d3 e3 
-b1 c2 d2 e2 0  
-c1 d1 e1 0 0 
+DO_MOVE e1-d2
 
-
+PRINT_GAME_BOARD

@@ -6,6 +6,7 @@
 
 
 void Board::assignCoords(int q,int r, int row_size){
+    Board_vector[r][q].used = true;
 
     if(r<size+1){
 
@@ -74,13 +75,12 @@ int Board::loadBoard(int expected_white_pawns_left,int expected_black_pawns_left
             for (int q = 0; q < row_size; q++) {
                 if(q==0 || q==row_size-1 || r==0 || r==size_with_borders-1){
                     Board_vector[r][q].sign = '+';
-                    Board_vector[r][q].used = true;
+                    Board_vector[r][q].border = true;
                     assignCoords(q,r,row_size);
                     continue;
                 }
                 Board_vector[r][q].sign = row_vector.front();
                 row_vector.erase(row_vector.begin());
-                Board_vector[r][q].used = true;
 
                 assignCoords(q,r,row_size);
 
@@ -118,6 +118,7 @@ void Board::printBoard(){
     int board_size = 2 * size - 1;
     bool wasSpacing;
     int size_with_borders = (size+1)*2-1;
+
 
     for (int r = 0; r < size_with_borders; r++) {
         int row_size = (2 * size + 1) - abs(size - r);
@@ -174,3 +175,104 @@ void Board::printCOORDS(){
 bool Board::isCoordsValid(char x, int y) const {
     return coordsToIndexes(x,y).first!=-1;
 }
+
+bool Board::isBorder(char x, int y) const {
+    return Board_vector[coordsToIndexes(x,y).first][coordsToIndexes(x,y).second].border;
+}
+
+bool Board::isDirectionValid(char x, int y, char x1, int y1) const{
+    int size_with_borders = (size+1)*2-1;
+    int height_index = coordsToIndexes(x,y).first;
+    int width_index = coordsToIndexes(x,y).second;
+    int height1_index = coordsToIndexes(x1,y1).first;
+    int width1_index = coordsToIndexes(x1,y1).second;
+    vector <std::pair<int,int>> possible_directions;
+    int current_line_size = (2 * size + 1) - abs(size - height_index);
+
+    if(height_index==-1 || width_index==-1 || height1_index==-1 || width1_index==-1){
+        return false;
+    }
+    if(Board_vector[height1_index][width1_index].border){
+        return false;
+    }
+
+    if(height_index==0){
+        if(height_index-1==height1_index && width_index==width1_index){
+            return true;
+        }
+        else if(height_index-1==height1_index && width_index+1==width1_index){
+            return true;
+        }
+    }
+
+    if(height_index==size_with_borders-1){
+        if(height_index-1==height1_index && width_index==width1_index){
+            return true;
+        }
+        else if(height_index-1==height1_index && width_index+1==width1_index){
+            return true;
+        }
+    }
+
+    if(height_index==height1_index && (width_index-1==width1_index || width_index+1==width1_index)){
+        return true;
+    }
+
+
+
+    if(height_index<(size_with_borders-1)/2){
+        if(width_index==0){
+            if(height_index+1==height1_index && width_index+1==width1_index){
+                return true;
+            }
+        }
+        if(width_index==current_line_size-2){
+            if(height_index+1==height1_index && width_index==width1_index){
+                return true;
+            }
+        }
+    }
+    else if(height_index>(size_with_borders-1)/2){
+        if(width_index==0){
+            if(height_index-1==height1_index && width_index+1==width1_index){
+                return true;
+            }
+        }
+        if(width_index==current_line_size-2){
+            if(height_index-1==height1_index && width_index==width1_index){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
+//bool Board::isDirectionValid(char x, int y, char x1, int y1) const {
+//    int height_index = coordsToIndexes(x,y).first;
+//    int width_index = coordsToIndexes(x,y).second;
+//    int x1_index = coordsToIndexes(x1,y1).first;
+//    int y1_index = coordsToIndexes(x1,y1).second;
+//
+//    if(height_index==-1 || width_index==-1 || x1_index==-1 || y1_index==-1){
+//        return false;
+//    }
+//    if(Board_vector[height_index][width_index].border){
+//        return false;
+//    }
+//
+//    if(height_index==x1_index && (width_index-1==y1_index || width_index+1==y1_index)){
+//        return true;
+//    }
+//
+//    if(height_index<size+1){
+//
+//
+//    }
+//    else if(height_index>=size+1){
+//
+//    }
+//
+//    return false;
+//
+//}
