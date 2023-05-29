@@ -47,6 +47,10 @@ public:
     bool isCoordsValid(char x, int y) const;
     bool isBorder(char x, int y) const;
     bool isDirectionValid(char x, int y, char x1, int y1) const;
+    vector <std::pair<int,int>> getRow(char x, int y, char x1, int y1) const;
+    bool isRowFull(const vector <std::pair<int,int>>& row) const;
+    void movePawns(vector <std::pair<int,int>> row,bool isWhiteTurn);
+    int checkBoard(int k);
 };
 
 

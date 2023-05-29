@@ -21,6 +21,9 @@ public:
     void loadGameState();
     void printGameState() const;
     Board* getBoard(){return board;}
+    bool getIsWhiteTurn() const;
+    void setIsWhiteTurn(bool isWhiteTurn_value);
+    void updateState();
 };
 
 

@@ -32,11 +32,19 @@ int main() {
                     cout<<"UNKNOWN_MOVE_DIRECTION"<<endl<<endl;
                 }
                 else{
-                    indexes = gameState.getBoard()->coordsToIndexes(x,y);
-                    indexes1 = gameState.getBoard()->coordsToIndexes(x1,y1);
-//                    cout<<indexes.first<<" "<<indexes.second<<endl;
-//                    cout<<indexes1.first<<" "<<indexes1.second<<endl;
-                    cout<<"MOVE_COMMITTED"<<endl<<endl;
+                    vector <std::pair<int,int>> row = gameState.getBoard()->getRow(x,y,x1,y1);
+//                    for(auto & pair : row){
+//                        cout<<pair.first<<" "<<pair.second<<endl;
+//                    }
+                    if(gameState.getBoard()->isRowFull(row)){
+                        cout<<"BAD_MOVE_ROW_IS_FULL"<<endl<<endl;
+                    }
+                    else {
+                        gameState.getBoard()->movePawns(row,gameState.getIsWhiteTurn());
+                        gameState.updateState();
+
+                        cout << "MOVE_COMMITTED" << endl << endl;
+                    }
                 }
             }
             else{

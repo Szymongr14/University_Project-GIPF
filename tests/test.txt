@@ -1,33 +1,8 @@
 LOAD_GAME_BOARD
-2 3 5 5
-2 2 W
- W B
-B _ W
- W B
-
-DO_MOVE a1-b2
-
-PRINT_GAME_BOARD
-
-DO_MOVE a1-f3
-
-DO_MOVE f3-e3
-
-DO_MOVE d5-d4
-
-DO_MOVE a1-c2
-
-DO_MOVE b2-c2
-
-DO_MOVE a1-b1
-
-LOAD_GAME_BOARD
-2 3 5 5
-2 2 W
- W B
-B _ W
- W B
-
-DO_MOVE e1-d2
-
-PRINT_GAME_BOARD
+3 3 12 12
+9 9 W
+  _ _ _
+ _ _ _ B
+W _ _ _ B
+ W _ _ _
+  W _ B

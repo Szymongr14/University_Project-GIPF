@@ -56,10 +56,10 @@ int Board::loadBoard(int expected_white_pawns_left,int expected_black_pawns_left
     }
 
 
-    if(actual_white_pawns_left!=expected_white_pawns_left){
+    if(actual_white_pawns_left>expected_white_pawns_left){
         message_to_user=2;
     }
-    if(actual_black_pawns_left!=expected_black_pawns_left){
+    if(actual_black_pawns_left>expected_black_pawns_left){
         message_to_user=3;
     }
     if(row_vector.size()!=expected_row_size){
@@ -186,7 +186,6 @@ bool Board::isDirectionValid(char x, int y, char x1, int y1) const{
     int width_index = coordsToIndexes(x,y).second;
     int height1_index = coordsToIndexes(x1,y1).first;
     int width1_index = coordsToIndexes(x1,y1).second;
-    vector <std::pair<int,int>> possible_directions;
     int current_line_size = (2 * size + 1) - abs(size - height_index);
 
     if(height_index==-1 || width_index==-1 || height1_index==-1 || width1_index==-1){
@@ -197,7 +196,7 @@ bool Board::isDirectionValid(char x, int y, char x1, int y1) const{
     }
 
     if(height_index==0){
-        if(height_index-1==height1_index && width_index==width1_index){
+        if(height_index+1==height1_index && width_index==width1_index){
             return true;
         }
         else if(height_index-1==height1_index && width_index+1==width1_index){
@@ -245,6 +244,256 @@ bool Board::isDirectionValid(char x, int y, char x1, int y1) const{
         }
     }
     return false;
+}
+
+vector<std::pair<int, int>> Board::getRow(char x, int y, char x1, int y1) const {
+    vector<std::pair<int, int>> row;
+    int size_with_borders = (size+1)*2-1;
+    int height_index = coordsToIndexes(x,y).first;
+    int width_index = coordsToIndexes(x,y).second;
+    int height1_index = coordsToIndexes(x1,y1).first;
+    int width1_index = coordsToIndexes(x1,y1).second;
+    int current_line_size = (2 * size + 1) - abs(size - height_index);
+
+    int temp_x=height1_index, temp_y=width1_index;
+
+    if(height_index+1==height1_index && width_index+1==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            if(temp_x<(size_with_borders-1)/2){
+                temp_x++;
+                temp_y++;
+            }
+            else{
+                temp_x++;
+            }
+        }
+        return row;
+    }
+    else if(height_index+1==height1_index && width_index==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            if(temp_x<(size_with_borders-1)/2){
+                temp_x++;
+            }
+            else{
+                temp_x++;
+                temp_y--;
+            }
+        }
+        return row;
+    }
+    else if(height_index==height1_index && width_index+1==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            temp_y++;
+        }
+        return row;
+    }
+    else if(height_index==height1_index && width_index-1==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            temp_y--;
+        }
+        return row;
+    }
+    else if(height_index-1==height1_index && width_index==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            if(temp_x<=(size_with_borders-1)/2){
+                temp_x--;
+                temp_y--;
+            }
+            else{
+                temp_x--;
+            }
+        }
+        return row;
+    }
+    else if(height_index-1==height1_index && width_index+1==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            if(temp_x<=(size_with_borders-1)/2){
+                temp_x--;
+            }
+            else{
+                temp_x--;
+                temp_y++;
+            }
+        }
+        return row;
+    }
+
+
+    return row;
+}
+
+bool Board::isRowFull(const vector <std::pair<int,int>>& row) const {
+    for(auto & pair: row){
+        if(Board_vector[pair.first][pair.second].sign=='_'){
+            return false;
+        }
+    }
+    return true;
+}
+
+void Board::movePawns(vector<std::pair<int, int>> row, bool isWhite) {
+    int temp_x, temp_y;
+    temp_x = row[0].first;
+    temp_y = row[0].second;
+    int i=1;
+
+    while(Board_vector[temp_x][temp_y].sign!='_'){
+        temp_x = row[i].first;
+        temp_y = row[i].second;
+        i++;
+    }
+
+    for(int j = i-1; j>0; j--){
+        Board_vector[row[j].first][row[j].second].sign = Board_vector[row[j-1].first][row[j-1].second].sign;
+    }
+
+    if(isWhite){
+        Board_vector[row[0].first][row[0].second].sign = 'W';
+    }
+    else{
+        Board_vector[row[0].first][row[0].second].sign = 'B';
+    }
+}
+
+bool hasNConsecutive(const vector<char>& vec, int n) {
+    if (vec.size() < n) {
+        return false;
+    }
+
+    for (size_t i = 0; i <= vec.size() - n; ++i) {
+        bool areSame = true;
+        for (int j = 1; j < n; ++j) {
+            if (vec[i + j] != vec[i] || vec[i] == '_') {
+                areSame = false;
+                break;
+            }
+        }
+        if (areSame) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+int Board::checkBoard(int k) {
+    vector<char> signs;
+    int temp_x=0, temp_y=0, temp_x_to_slant, temp_y_to_slant,invalid_rows=0;
+    int size_with_borders = (size + 1) * 2 - 1;
+
+    //first diagonal slant
+    int j = 0;
+    for (int i = 0; i < size_with_borders; i++) {
+        if (j < size+1) {
+            temp_x_to_slant = temp_x;
+            temp_y_to_slant = temp_y;
+            do{
+                signs.push_back(Board_vector[temp_x_to_slant][temp_y_to_slant].sign);
+                if(temp_x_to_slant<(size_with_borders-1)/2){
+                    temp_x_to_slant++;
+                }
+                else{
+                    temp_x_to_slant++;
+                    temp_y_to_slant--;
+                }
+            }while(!Board_vector[temp_x_to_slant][temp_y_to_slant].border);
+            temp_y++;
+            j++;
+        }
+        else {
+            temp_x++;
+            temp_x_to_slant = temp_x;
+            temp_y_to_slant = temp_y;
+            do{
+                signs.push_back(Board_vector[temp_x_to_slant][temp_y_to_slant].sign);
+                if(temp_x_to_slant<(size_with_borders-1)/2){
+                    temp_x_to_slant++;
+                }
+                else{
+                    temp_x_to_slant++;
+                    temp_y_to_slant--;
+                }
+            }while(!Board_vector[temp_x_to_slant][temp_y_to_slant].border);
+            temp_y++;
+        }
+        //checking if signs vector has k same signs next to each other
+        if(hasNConsecutive(signs,k)){
+            invalid_rows++;
+        }
+        signs.clear();
+    }
+
+    //second diagonal slant
+    j = 0;
+    temp_x = 0;
+    temp_y = (size+1)-1;
+    for (int i = 0; i < size_with_borders; i++) {
+        if (j < size+1) {
+            temp_x_to_slant = temp_x;
+            temp_y_to_slant = temp_y;
+            do{
+                signs.push_back(Board_vector[temp_x_to_slant][temp_y_to_slant].sign);
+                if(temp_x_to_slant<(size_with_borders-1)/2){
+                    temp_x_to_slant++;
+                    temp_y_to_slant++;
+                }
+                else{
+                    temp_x_to_slant++;
+                }
+            }while(!Board_vector[temp_x_to_slant][temp_y_to_slant].border);
+            temp_y--;
+            j++;
+        }
+        else {
+            temp_y=0;
+            temp_x++;
+            temp_x_to_slant = temp_x;
+            temp_y_to_slant = temp_y;
+            do{
+                signs.push_back(Board_vector[temp_x_to_slant][temp_y_to_slant].sign);
+                if(temp_x_to_slant<(size_with_borders-1)/2){
+                    temp_x_to_slant++;
+                    temp_y_to_slant++;
+                }
+                else{
+                    temp_x_to_slant++;
+                }
+            }while(!Board_vector[temp_x_to_slant][temp_y_to_slant].border);
+        }
+        //checking if signs vector has k same signs next to each other
+        if(hasNConsecutive(signs,k)){
+            invalid_rows++;
+        }
+        signs.clear();
+    }
+
+    //checking horizontal lines
+    for(int i=0; i<size_with_borders; i++){
+        int current_line_size = (2 * size + 1) - abs(size - i);
+        for(int j=0; j<current_line_size; j++){
+            if(Board_vector[i][j].border){
+                continue;
+            }
+            else{
+                signs.push_back(Board_vector[i][j].sign);
+            }
+        }
+        //checking if signs vector has k same signs next to each other
+        if(hasNConsecutive(signs,k)){
+            invalid_rows++;
+        }
+        signs.clear();
+    }
+
+
+//    int current_line_size = (2 * size + 1) - abs(size - height_index);
+    return invalid_rows;
 }
 
 
