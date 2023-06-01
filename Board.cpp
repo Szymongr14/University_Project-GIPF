@@ -58,15 +58,19 @@ int Board::loadBoard(int expected_white_pawns_left,int expected_black_pawns_left
 
     if(actual_white_pawns_left>expected_white_pawns_left){
         message_to_user=2;
+        invalid_board= true;
     }
     if(actual_black_pawns_left>expected_black_pawns_left){
         message_to_user=3;
+        invalid_board= true;
     }
     if(row_vector.size()!=expected_row_size){
         message_to_user=1;
+        invalid_board= true;
     }
 
     if(message_to_user==0){
+        invalid_board=false;
         coords_to_indexes.clear();
         int size_with_borders = (size+1)*2-1;
         for (int r = 0; r < size_with_borders; r++) {
@@ -387,7 +391,7 @@ int Board::checkBoard(int k) {
     int temp_x=0, temp_y=0, temp_x_to_slant, temp_y_to_slant,invalid_rows=0;
     int size_with_borders = (size + 1) * 2 - 1;
 
-    //first diagonal slant
+    //first diagonal
     int j = 0;
     for (int i = 0; i < size_with_borders; i++) {
         if (j < size+1) {
@@ -429,7 +433,7 @@ int Board::checkBoard(int k) {
         signs.clear();
     }
 
-    //second diagonal slant
+    //second diagonal
     j = 0;
     temp_x = 0;
     temp_y = (size+1)-1;
@@ -492,8 +496,16 @@ int Board::checkBoard(int k) {
     }
 
 
-//    int current_line_size = (2 * size + 1) - abs(size - height_index);
+    if(invalid_rows) invalid_board = true;
     return invalid_rows;
+}
+
+bool Board::isInvalidBoard() const {
+    return invalid_board;
+}
+
+void Board::setInvalidBoard(bool invalidBoard) {
+    invalid_board = invalidBoard;
 }
 
 

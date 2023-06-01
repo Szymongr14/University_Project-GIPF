@@ -22,28 +22,32 @@ void GameState::loadGameState(){
         case 0:
             error_code=board->checkBoard(pawns_which_trigger);
             if(!error_code){
-                cout<<"BOARD_STATE_OK"<<'\n'<<'\n';
+                cout<<"BOARD_STATE_OK"<<'\n';
             } else if(error_code==1){
-                cout<<"ERROR_FOUND_1_ROW_OF_LENGTH_K"<<'\n'<<'\n';
+                cout<<"ERROR_FOUND_1_ROW_OF_LENGTH_K"<<'\n';
             }
             else{
-                cout<<"ERROR_FOUND_"<<error_code<<"_ROWS_OF_LENGTH_K"<<'\n'<<'\n';
+                cout<<"ERROR_FOUND_"<<error_code<<"_ROWS_OF_LENGTH_K"<<'\n';
             }
             break;
         case 1:
-            cout<<"WRONG_BOARD_ROW_LENGTH"<<'\n'<<'\n';
+            cout<<"WRONG_BOARD_ROW_LENGTH"<<'\n';
             break;
         case 2:
-            cout<<"WRONG_WHITE_PAWNS_NUMBER"<<'\n'<<'\n';
+            cout<<"WRONG_WHITE_PAWNS_NUMBER"<<'\n';
             break;
         case 3:
-            cout<<"WRONG_BLACK_PAWNS_NUMBER"<<'\n'<<'\n';
+            cout<<"WRONG_BLACK_PAWNS_NUMBER"<<'\n';
             break;
     }
 }
 
 
 void GameState::printGameState() const{
+    if(board->isInvalidBoard()){
+        cout<<"EMPTY_BOARD"<<'\n';
+        return;
+    }
     cout << size << " " << pawns_which_trigger << " " << total_white_pawns << " " << total_black_pawns <<'\n'<< white_pawns_left << " " << black_pawns_left << " ";
     if(isWhiteTurn){
         cout<<"W"<<endl;

@@ -30,6 +30,13 @@ private:
     vector<vector<BoardField>>  Board_vector;
     std::unordered_map<string, std::pair<int, int>> coords_to_indexes;
     int size=0;
+    bool invalid_board= true;
+public:
+    bool isInvalidBoard() const;
+
+    void setInvalidBoard(bool invalidBoard);
+
+private:
 
     void assignCoords(int q,int r, int row_size);
 
