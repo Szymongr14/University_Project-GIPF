@@ -17,11 +17,15 @@ struct HexCoords{
     int y=0;
 };
 
-class BoardField{
-public:
+struct BoardField{
     char sign;
     bool isEmpty,used,border = false;
     HexCoords hex_coords;
+};
+
+struct Pawn {
+    char sign;
+    int x,y;
 };
 
 
@@ -57,7 +61,11 @@ public:
     vector <std::pair<int,int>> getRow(char x, int y, char x1, int y1) const;
     bool isRowFull(const vector <std::pair<int,int>>& row) const;
     void movePawns(vector <std::pair<int,int>> row,bool isWhiteTurn);
-    int checkBoard(int k);
+    int checkBoard(int k, bool delete_pawns = false);
+    int checkSWandNE(int k, bool delete_pawns = false);
+    int checkSEandNW(int k, bool delete_pawns = false);
+    int checkHorizontalLines(int k, bool delete_pawns = false);
+    void deletePawns(const vector <Pawn>& pawns);
 };
 
 

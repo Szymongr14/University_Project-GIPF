@@ -42,7 +42,7 @@ int main() {
                     else {
                         gameState.getBoard()->movePawns(row,gameState.getIsWhiteTurn());
                         gameState.updateState();
-
+//                        gameState.getBoard()->checkBoard();
                         cout << "MOVE_COMMITTED" << endl << endl;
                     }
                 }

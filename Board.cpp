@@ -257,8 +257,6 @@ vector<std::pair<int, int>> Board::getRow(char x, int y, char x1, int y1) const 
     int width_index = coordsToIndexes(x,y).second;
     int height1_index = coordsToIndexes(x1,y1).first;
     int width1_index = coordsToIndexes(x1,y1).second;
-    int current_line_size = (2 * size + 1) - abs(size - height_index);
-
     int temp_x=height1_index, temp_y=width1_index;
 
     if(height_index+1==height1_index && width_index+1==width1_index){
@@ -328,7 +326,6 @@ vector<std::pair<int, int>> Board::getRow(char x, int y, char x1, int y1) const 
         return row;
     }
 
-
     return row;
 }
 
@@ -365,20 +362,27 @@ void Board::movePawns(vector<std::pair<int, int>> row, bool isWhite) {
     }
 }
 
-bool hasNConsecutive(const vector<char>& vec, int n) {
+void Board::deletePawns(const vector<Pawn>& pawns) {
+    for(auto & pair: pawns){
+        Board_vector[pair.x][pair.y].sign = '_';
+
+    }
+}
+
+bool hasNFollowing(const vector<Pawn>& vec, int n) {
     if (vec.size() < n) {
         return false;
     }
 
     for (size_t i = 0; i <= vec.size() - n; ++i) {
-        bool areSame = true;
+        bool are_same = true;
         for (int j = 1; j < n; ++j) {
-            if (vec[i + j] != vec[i] || vec[i] == '_') {
-                areSame = false;
+            if (vec[i + j].sign != vec[i].sign || vec[i].sign == '_') {
+                are_same = false;
                 break;
             }
         }
-        if (areSame) {
+        if (are_same) {
             return true;
         }
     }
@@ -386,8 +390,39 @@ bool hasNConsecutive(const vector<char>& vec, int n) {
     return false;
 }
 
-int Board::checkBoard(int k) {
-    vector<char> signs;
+int Board::checkHorizontalLines(int k,bool delete_pawns) {
+    vector<Pawn> pawns;
+    Pawn temp_pawn;
+    int invalid_rows=0;
+    int size_with_borders = (size + 1) * 2 - 1;
+
+    for(int i=0; i<size_with_borders; i++){
+        int current_line_size = (2 * size + 1) - abs(size - i);
+        for(int j=0; j<current_line_size; j++){
+            if(Board_vector[i][j].border){
+                continue;
+            }
+            else{
+                temp_pawn.sign = Board_vector[i][j].sign;
+                temp_pawn.x = i;
+                temp_pawn.y = j;
+                pawns.push_back(temp_pawn);
+            }
+        }
+        if(hasNFollowing(pawns,k)){
+            invalid_rows++;
+            if(delete_pawns){
+
+            }
+        }
+        pawns.clear();
+    }
+    return invalid_rows;
+}
+
+int Board::checkSWandNE(int k,bool delete_pawns){
+    vector<Pawn> pawns;
+    Pawn temp_pawn;
     int temp_x=0, temp_y=0, temp_x_to_slant, temp_y_to_slant,invalid_rows=0;
     int size_with_borders = (size + 1) * 2 - 1;
 
@@ -398,7 +433,10 @@ int Board::checkBoard(int k) {
             temp_x_to_slant = temp_x;
             temp_y_to_slant = temp_y;
             do{
-                signs.push_back(Board_vector[temp_x_to_slant][temp_y_to_slant].sign);
+                temp_pawn.sign = Board_vector[temp_x_to_slant][temp_y_to_slant].sign;
+                temp_pawn.x = temp_x_to_slant;
+                temp_pawn.y = temp_y_to_slant;
+                pawns.push_back(temp_pawn);
                 if(temp_x_to_slant<(size_with_borders-1)/2){
                     temp_x_to_slant++;
                 }
@@ -415,7 +453,10 @@ int Board::checkBoard(int k) {
             temp_x_to_slant = temp_x;
             temp_y_to_slant = temp_y;
             do{
-                signs.push_back(Board_vector[temp_x_to_slant][temp_y_to_slant].sign);
+                temp_pawn.sign = Board_vector[temp_x_to_slant][temp_y_to_slant].sign;
+                temp_pawn.x = temp_x_to_slant;
+                temp_pawn.y = temp_y_to_slant;
+                pawns.push_back(temp_pawn);
                 if(temp_x_to_slant<(size_with_borders-1)/2){
                     temp_x_to_slant++;
                 }
@@ -426,23 +467,31 @@ int Board::checkBoard(int k) {
             }while(!Board_vector[temp_x_to_slant][temp_y_to_slant].border);
             temp_y++;
         }
-        //checking if signs vector has k same signs next to each other
-        if(hasNConsecutive(signs,k)){
+        if(hasNFollowing(pawns,k)){
             invalid_rows++;
         }
-        signs.clear();
+        pawns.clear();
     }
+        return invalid_rows;
+}
+
+int Board::checkSEandNW(int k,bool delete_pawns) {
+    vector<Pawn> pawns;
+    Pawn temp_pawn;
+    int temp_x=0, temp_y=(size+1)-1, temp_x_to_slant, temp_y_to_slant,invalid_rows=0;
+    int size_with_borders = (size + 1) * 2 - 1;
+    int j = 0;
 
     //second diagonal
-    j = 0;
-    temp_x = 0;
-    temp_y = (size+1)-1;
     for (int i = 0; i < size_with_borders; i++) {
         if (j < size+1) {
             temp_x_to_slant = temp_x;
             temp_y_to_slant = temp_y;
             do{
-                signs.push_back(Board_vector[temp_x_to_slant][temp_y_to_slant].sign);
+                temp_pawn.sign = Board_vector[temp_x_to_slant][temp_y_to_slant].sign;
+                temp_pawn.x = temp_x_to_slant;
+                temp_pawn.y = temp_y_to_slant;
+                pawns.push_back(temp_pawn);
                 if(temp_x_to_slant<(size_with_borders-1)/2){
                     temp_x_to_slant++;
                     temp_y_to_slant++;
@@ -460,7 +509,10 @@ int Board::checkBoard(int k) {
             temp_x_to_slant = temp_x;
             temp_y_to_slant = temp_y;
             do{
-                signs.push_back(Board_vector[temp_x_to_slant][temp_y_to_slant].sign);
+                temp_pawn.sign = Board_vector[temp_x_to_slant][temp_y_to_slant].sign;
+                temp_pawn.x = temp_x_to_slant;
+                temp_pawn.y = temp_y_to_slant;
+                pawns.push_back(temp_pawn);
                 if(temp_x_to_slant<(size_with_borders-1)/2){
                     temp_x_to_slant++;
                     temp_y_to_slant++;
@@ -470,31 +522,22 @@ int Board::checkBoard(int k) {
                 }
             }while(!Board_vector[temp_x_to_slant][temp_y_to_slant].border);
         }
-        //checking if signs vector has k same signs next to each other
-        if(hasNConsecutive(signs,k)){
+        if(hasNFollowing(pawns,k)){
             invalid_rows++;
         }
-        signs.clear();
+        pawns.clear();
     }
+    return invalid_rows;
+}
 
-    //checking horizontal lines
-    for(int i=0; i<size_with_borders; i++){
-        int current_line_size = (2 * size + 1) - abs(size - i);
-        for(int j=0; j<current_line_size; j++){
-            if(Board_vector[i][j].border){
-                continue;
-            }
-            else{
-                signs.push_back(Board_vector[i][j].sign);
-            }
-        }
-        //checking if signs vector has k same signs next to each other
-        if(hasNConsecutive(signs,k)){
-            invalid_rows++;
-        }
-        signs.clear();
-    }
+int Board::checkBoard(int k,bool delete_pawns) {
+    vector<char> signs;
+    int invalid_rows=0;
 
+    // checking every diagonal and horizontal line
+    invalid_rows += checkSWandNE(k,delete_pawns);
+    invalid_rows += checkSEandNW(k,delete_pawns);
+    invalid_rows += checkHorizontalLines(k,delete_pawns);
 
     if(invalid_rows) invalid_board = true;
     return invalid_rows;
@@ -507,33 +550,3 @@ bool Board::isInvalidBoard() const {
 void Board::setInvalidBoard(bool invalidBoard) {
     invalid_board = invalidBoard;
 }
-
-
-//bool Board::isDirectionValid(char x, int y, char x1, int y1) const {
-//    int height_index = coordsToIndexes(x,y).first;
-//    int width_index = coordsToIndexes(x,y).second;
-//    int x1_index = coordsToIndexes(x1,y1).first;
-//    int y1_index = coordsToIndexes(x1,y1).second;
-//
-//    if(height_index==-1 || width_index==-1 || x1_index==-1 || y1_index==-1){
-//        return false;
-//    }
-//    if(Board_vector[height_index][width_index].border){
-//        return false;
-//    }
-//
-//    if(height_index==x1_index && (width_index-1==y1_index || width_index+1==y1_index)){
-//        return true;
-//    }
-//
-//    if(height_index<size+1){
-//
-//
-//    }
-//    else if(height_index>=size+1){
-//
-//    }
-//
-//    return false;
-//
-//}
