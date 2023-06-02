@@ -11,8 +11,7 @@ int main() {
             gameState.loadGameState();
         } else if (command == "PRINT_GAME_BOARD") {
             gameState.printGameState();
-        }
-        else if(command=="DO_MOVE") {
+        } else if(command=="DO_MOVE") {
             gameState.doMove();
         }
     }

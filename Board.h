@@ -37,26 +37,19 @@ private:
     GameState* gameState;
     int size=0;
     bool invalid_board= true;
-public:
-    bool isInvalidBoard() const;
-
-    void setInvalidBoard(bool invalidBoard);
-
-private:
 
     void assignCoords(int q,int r, int row_size);
 
 public:
-    Board (int size,GameState* state):size(size), Board_vector(size*2-1, vector<BoardField>(size*2-1)),gameState(state){}
     Board()= default;
+    Board (int size,GameState* state):size(size), Board_vector(size*2-1, vector<BoardField>(size*2-1)),gameState(state){}
 
     int loadBoard(int expected_white_pawns_left,int expected_black_pawns_left);
     void setSize(int size_value);
     void printBoard();
     std::pair<int, int> coordsToIndexes(char x, int y) const;
-    void printBoardAsCoords() const;
     void printCOORDS();
-
+    bool isInvalidBoard() const;
     bool isCoordsValid(char x, int y) const;
     bool isBorder(char x, int y) const;
     bool isDirectionValid(char x, int y, char x1, int y1) const;

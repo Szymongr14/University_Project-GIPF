@@ -6,7 +6,6 @@
 #define GIPF_GAMESTATE_H
 #include <iostream>
 #include <string>
-#include <memory>
 #include "Board.h"
 
 class GameState {
@@ -20,38 +19,23 @@ public:
 
     void loadGameState();
     void printGameState() const;
-//    Board* getBoard(){return board;}
     void updateState();
     void doMove();
 
     int getSize() const;
-
     void setSize(int size);
-
     int getPawnsWhichTrigger() const;
-
     void setPawnsWhichTrigger(int pawnsWhichTrigger);
-
     int getTotalWhitePawns() const;
-
     void setTotalWhitePawns(int totalWhitePawns);
-
     int getTotalBlackPawns() const;
-
     void setTotalBlackPawns(int totalBlackPawns);
-
     int getWhitePawnsLeft() const;
-
     void setWhitePawnsLeft(int whitePawnsLeft);
-
     int getBlackPawnsLeft() const;
-
     void setBlackPawnsLeft(int blackPawnsLeft);
-
     bool isWhiteTurn1() const;
-
     void setIsWhiteTurn(bool isWhiteTurn);
 };
-
 
 #endif //GIPF_GAMESTATE_H

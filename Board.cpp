@@ -10,7 +10,6 @@ void Board::assignCoords(int q,int r, int row_size){
     Board_vector[r][q].used = true;
 
     if(r<size+1){
-
         Board_vector[r][q].hex_coords.x = 'a' + q;
         if(q>=row_size-r){
             Board_vector[r][q].hex_coords.y = Board_vector[r][q-1].hex_coords.y;
@@ -35,7 +34,6 @@ int Board::loadBoard(int expected_white_pawns_left,int expected_black_pawns_left
     // 1-WRONG_BOARD_ROW_LENGTH
     // 2-WRONG_WHITE_PAWNS_NUMBER
     // 3-WRONG_BLACK_PAWNS_NUMBER
-    int fixed_size = size-1;
     int board_size = 2 * size - 1;
     int expected_row_size = 3 * size * (size - 1) + 1;
     int actual_white_pawns_left=0,actual_black_pawns_left=0;
@@ -55,7 +53,6 @@ int Board::loadBoard(int expected_white_pawns_left,int expected_black_pawns_left
         }
         line.clear();
     }
-
 
     if(actual_white_pawns_left>expected_white_pawns_left){
         message_to_user=2;
@@ -89,7 +86,6 @@ int Board::loadBoard(int expected_white_pawns_left,int expected_black_pawns_left
 
                 assignCoords(q,r,row_size);
 
-
                 if (Board_vector[r][q].sign == '_') {
                     Board_vector[r][q].isEmpty = true;
                 } else if (Board_vector[r][q].sign == 'W' || Board_vector[r][q].sign == 'B') {
@@ -120,10 +116,8 @@ std::pair<int, int> Board::coordsToIndexes(char x, int y) const {
 }
 
 void Board::printBoard(){
-    int board_size = 2 * size - 1;
     bool wasSpacing;
     int size_with_borders = (size+1)*2-1;
-
 
     for (int r = 0; r < size_with_borders; r++) {
         int row_size = (2 * size + 1) - abs(size - r);
@@ -132,7 +126,6 @@ void Board::printBoard(){
             if(q==0 || q==row_size-1 || r==0 || r==size_with_borders-1){
                 continue;
             }
-
             if(!wasSpacing){
                 for(int t=0;t<size_with_borders-row_size;t++){
                     cout<<" ";
@@ -145,33 +138,10 @@ void Board::printBoard(){
     }
 }
 
-
-void Board::printBoardAsCoords() const {
-    int fixed_size = size-1;
-    int board_size = 2 * size - 1;
-    bool wasSpacing;
-
-    for (int r = 0; r < board_size; r++) {
-        int row_size = (2 * fixed_size + 1) - abs(fixed_size - r);
-        wasSpacing = false;
-        for (int q = 0; q < row_size; q++) {
-
-            if(!wasSpacing){
-                for(int t=0;t<board_size-row_size;t++){
-                    cout<<" ";
-                }
-                wasSpacing = true;
-            }
-            cout << Board_vector[r][q].hex_coords.x << Board_vector[r][q].hex_coords.y << " ";
-        }
-        cout << '\n';
-    }
-}
-
 void Board::printCOORDS(){
     for(auto & i : Board_vector){
-        for(int j=0;j<i.size();j++){
-            cout<<i[j].hex_coords.x<<i[j].hex_coords.y<<" ";
+        for(auto & j : i){
+            cout<<j.hex_coords.x<<j.hex_coords.y<<" ";
         }
         cout<<endl;
     }
@@ -401,31 +371,24 @@ int hasNFollowing(vector<Pawn> &vec, int n) {
             }
         }
         if (are_same) {
+            //which color has N following
+            int color = vec[i].sign == 'W' ? 1 : 2;
 
-
-
-            if (vec[i].sign == 'W') {
-                while(vec[i-1].sign != '_' && i > 0 ) {
-                    i--;
-                }
-                while(vec[i].sign != '_' && i <= vec.size() - 1) {
-                    vec[i].to_remove = true;
-                    i++;
-                }
+            while (vec[i - 1].sign != '_' && i > 0) {
+                i--;
+            }
+            while (vec[i].sign != '_' && i <= vec.size() - 1) {
+                vec[i].to_remove = true;
+                i++;
+            }
+            if(color==1){
                 return 1;
-            } else if (vec[i].sign == 'B') {
-                while(vec[i-1].sign != '_' && i > 0 ) {
-                    i--;
-                }
-                while(vec[i].sign != '_' && i <= vec.size() - 1) {
-                    vec[i].to_remove = true;
-                    i++;
-                }
+            }
+            else{
                 return 2;
             }
         }
     }
-
     return 0;
 }
 
@@ -592,8 +555,4 @@ int Board::checkBoard(int k,bool isWhiteTurn,bool delete_pawns) {
 
 bool Board::isInvalidBoard() const {
     return invalid_board;
-}
-
-void Board::setInvalidBoard(bool invalidBoard) {
-    invalid_board = invalidBoard;
 }
