@@ -3,6 +3,7 @@
 //
 
 #include "Board.h"
+#include "GameState.h"
 
 
 void Board::assignCoords(int q,int r, int row_size){
@@ -362,19 +363,36 @@ void Board::movePawns(vector<std::pair<int, int>> row, bool isWhite) {
     }
 }
 
-void Board::deletePawns(const vector<Pawn>& pawns) {
-    for(auto & pair: pawns){
-        Board_vector[pair.x][pair.y].sign = '_';
+void Board::deletePawns(int k,const vector<Pawn>& pawns, bool isWhiteTurn,int which_color) {
+    for(auto & pawn: pawns){
+        if(pawn.sign=='W' && pawn.to_remove){
+            if(which_color==1){
+                gameState->setWhitePawnsLeft(gameState->getWhitePawnsLeft()+1);
+            }
+        }
+        else if(pawn.sign=='B'&& pawn.to_remove){
+            if(which_color==2){
+                gameState->setBlackPawnsLeft(gameState->getBlackPawnsLeft()+1);
+            }
+        }
+        else{
+            continue;
+        }
 
+        if(pawn.to_remove) Board_vector[pawn.x][pawn.y].sign = '_';
     }
 }
 
-bool hasNFollowing(const vector<Pawn>& vec, int n) {
+int hasNFollowing(vector<Pawn> &vec, int n) {
+    //0 - no n following
+    //1 - white
+    //2 - black
+
     if (vec.size() < n) {
-        return false;
+        return 0;
     }
 
-    for (size_t i = 0; i <= vec.size() - n; ++i) {
+    for (int i = 0; i <= vec.size() - n; ++i) {
         bool are_same = true;
         for (int j = 1; j < n; ++j) {
             if (vec[i + j].sign != vec[i].sign || vec[i].sign == '_') {
@@ -383,14 +401,35 @@ bool hasNFollowing(const vector<Pawn>& vec, int n) {
             }
         }
         if (are_same) {
-            return true;
+
+
+
+            if (vec[i].sign == 'W') {
+                while(vec[i-1].sign != '_' && i > 0 ) {
+                    i--;
+                }
+                while(vec[i].sign != '_' && i <= vec.size() - 1) {
+                    vec[i].to_remove = true;
+                    i++;
+                }
+                return 1;
+            } else if (vec[i].sign == 'B') {
+                while(vec[i-1].sign != '_' && i > 0 ) {
+                    i--;
+                }
+                while(vec[i].sign != '_' && i <= vec.size() - 1) {
+                    vec[i].to_remove = true;
+                    i++;
+                }
+                return 2;
+            }
         }
     }
 
-    return false;
+    return 0;
 }
 
-int Board::checkHorizontalLines(int k,bool delete_pawns) {
+int Board::checkHorizontalLines(int k,bool isWhiteTurn,bool delete_pawns) {
     vector<Pawn> pawns;
     Pawn temp_pawn;
     int invalid_rows=0;
@@ -409,10 +448,11 @@ int Board::checkHorizontalLines(int k,bool delete_pawns) {
                 pawns.push_back(temp_pawn);
             }
         }
-        if(hasNFollowing(pawns,k)){
+        int return_value = hasNFollowing(pawns,k);
+        if(return_value){
             invalid_rows++;
             if(delete_pawns){
-
+                deletePawns(k,pawns,isWhiteTurn,return_value);
             }
         }
         pawns.clear();
@@ -420,7 +460,7 @@ int Board::checkHorizontalLines(int k,bool delete_pawns) {
     return invalid_rows;
 }
 
-int Board::checkSWandNE(int k,bool delete_pawns){
+int Board::checkSWandNE(int k,bool isWhiteTurn,bool delete_pawns){
     vector<Pawn> pawns;
     Pawn temp_pawn;
     int temp_x=0, temp_y=0, temp_x_to_slant, temp_y_to_slant,invalid_rows=0;
@@ -467,17 +507,21 @@ int Board::checkSWandNE(int k,bool delete_pawns){
             }while(!Board_vector[temp_x_to_slant][temp_y_to_slant].border);
             temp_y++;
         }
-        if(hasNFollowing(pawns,k)){
+        int return_value = hasNFollowing(pawns,k);
+        if(return_value){
             invalid_rows++;
+            if(delete_pawns){
+                deletePawns(k,pawns,isWhiteTurn,return_value);
+            }
         }
         pawns.clear();
     }
-        return invalid_rows;
+    return invalid_rows;
 }
 
-int Board::checkSEandNW(int k,bool delete_pawns) {
+int Board::checkSEandNW(int k,bool isWhiteTurn,bool delete_pawns) {
     vector<Pawn> pawns;
-    Pawn temp_pawn;
+    Pawn temp_pawn{};
     int temp_x=0, temp_y=(size+1)-1, temp_x_to_slant, temp_y_to_slant,invalid_rows=0;
     int size_with_borders = (size + 1) * 2 - 1;
     int j = 0;
@@ -522,24 +566,27 @@ int Board::checkSEandNW(int k,bool delete_pawns) {
                 }
             }while(!Board_vector[temp_x_to_slant][temp_y_to_slant].border);
         }
-        if(hasNFollowing(pawns,k)){
+        int return_value = hasNFollowing(pawns,k);
+        if(return_value){
             invalid_rows++;
+            if(delete_pawns){
+                deletePawns(k,pawns,isWhiteTurn,return_value);
+            }
         }
         pawns.clear();
     }
     return invalid_rows;
 }
 
-int Board::checkBoard(int k,bool delete_pawns) {
-    vector<char> signs;
+int Board::checkBoard(int k,bool isWhiteTurn,bool delete_pawns) {
     int invalid_rows=0;
 
     // checking every diagonal and horizontal line
-    invalid_rows += checkSWandNE(k,delete_pawns);
-    invalid_rows += checkSEandNW(k,delete_pawns);
-    invalid_rows += checkHorizontalLines(k,delete_pawns);
+    invalid_rows += checkSWandNE(k,isWhiteTurn,delete_pawns);
+    invalid_rows += checkSEandNW(k,isWhiteTurn,delete_pawns);
+    invalid_rows += checkHorizontalLines(k,isWhiteTurn,delete_pawns);
 
-    if(invalid_rows) invalid_board = true;
+    if(invalid_rows && !delete_pawns) invalid_board = true;
     return invalid_rows;
 }
 
