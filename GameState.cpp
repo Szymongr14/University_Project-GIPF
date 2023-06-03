@@ -166,5 +166,9 @@ void GameState::setIsWhiteTurn(bool isWhiteTurn) {
     GameState::isWhiteTurn = isWhiteTurn;
 }
 
+void GameState::genAllPosMovNum() {
+    cout<<board->genAllPosMovNums()<<"_UNIQUE_MOVES"<<endl;
+}
+
 
 

@@ -36,6 +36,7 @@ public:
     void setBlackPawnsLeft(int blackPawnsLeft);
     bool isWhiteTurn1() const;
     void setIsWhiteTurn(bool isWhiteTurn);
+    void genAllPosMovNum();
 };
 
 #endif //GIPF_GAMESTATE_H

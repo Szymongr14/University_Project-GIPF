@@ -13,6 +13,8 @@ int main() {
             gameState.printGameState();
         } else if(command=="DO_MOVE") {
             gameState.doMove();
+        } else if( command=="GEN_ALL_POS_MOV_NUM"){
+            gameState.genAllPosMovNum();
         }
     }
     return 0;

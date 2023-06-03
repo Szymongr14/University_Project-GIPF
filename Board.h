@@ -54,6 +54,7 @@ public:
     bool isBorder(char x, int y) const;
     bool isDirectionValid(char x, int y, char x1, int y1) const;
     vector <std::pair<int,int>> getRow(char x, int y, char x1, int y1) const;
+    vector <std::pair<int,int>> getRow_by_passing_indexes(int x, int y, int x1, int y1) const;
     bool isRowFull(const vector <std::pair<int,int>>& row) const;
     void movePawns(vector <std::pair<int,int>> row,bool isWhiteTurn);
     int checkBoard(int k,bool isWhiteTurn,bool delete_pawns = false);
@@ -62,7 +63,8 @@ public:
     int checkHorizontalLines(int k,bool isWhiteTurn, bool delete_pawns = false);
     void deletePawns(int k,const vector <Pawn>& pawns,bool isWhiteTurn,int which_color);
     void setGameState(GameState* state) {gameState = state;}
+    vector<vector<char>> returnCopyOfBoardAfterMove(vector<std::pair<int, int>> row);
+    int genAllPosMovNums();
+
 };
-
-
 #endif //GIPF_BOARD_H

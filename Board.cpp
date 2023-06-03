@@ -4,6 +4,7 @@
 
 #include "Board.h"
 #include "GameState.h"
+#include <set>
 
 
 void Board::assignCoords(int q,int r, int row_size){
@@ -300,6 +301,88 @@ vector<std::pair<int, int>> Board::getRow(char x, int y, char x1, int y1) const 
     return row;
 }
 
+
+vector<std::pair<int, int>> Board::getRow_by_passing_indexes(int x, int y, int x1, int y1) const {
+    vector<std::pair<int, int>> row;
+    int size_with_borders = (size+1)*2-1;
+    int height_index = x;
+    int width_index = y;
+    int height1_index = x1;
+    int width1_index = y1;
+    int temp_x=height1_index, temp_y=width1_index;
+
+    if(height_index+1==height1_index && width_index+1==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            if(temp_x<(size_with_borders-1)/2){
+                temp_x++;
+                temp_y++;
+            }
+            else{
+                temp_x++;
+            }
+        }
+        return row;
+    }
+    else if(height_index+1==height1_index && width_index==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            if(temp_x<(size_with_borders-1)/2){
+                temp_x++;
+            }
+            else{
+                temp_x++;
+                temp_y--;
+            }
+        }
+        return row;
+    }
+    else if(height_index==height1_index && width_index+1==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            temp_y++;
+        }
+        return row;
+    }
+    else if(height_index==height1_index && width_index-1==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            temp_y--;
+        }
+        return row;
+    }
+    else if(height_index-1==height1_index && width_index==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            if(temp_x<=(size_with_borders-1)/2){
+                temp_x--;
+                temp_y--;
+            }
+            else{
+                temp_x--;
+            }
+        }
+        return row;
+    }
+    else if(height_index-1==height1_index && width_index+1==width1_index){
+        while(!Board_vector[temp_x][temp_y].border){
+            row.emplace_back(temp_x,temp_y);
+            if(temp_x<=(size_with_borders-1)/2){
+                temp_x--;
+            }
+            else{
+                temp_x--;
+                temp_y++;
+            }
+        }
+        return row;
+    }
+
+    return row;
+}
+
+
+
 bool Board::isRowFull(const vector <std::pair<int,int>>& row) const {
     for(auto & pair: row){
         if(Board_vector[pair.first][pair.second].sign=='_'){
@@ -331,6 +414,44 @@ void Board::movePawns(vector<std::pair<int, int>> row, bool isWhite) {
     else{
         Board_vector[row[0].first][row[0].second].sign = 'B';
     }
+}
+
+
+vector<vector<char>> Board::returnCopyOfBoardAfterMove(vector<std::pair<int, int>> row){
+    //iterate through Board_vector and copy signs of board
+    int size_with_borders = (size + 1) * 2 - 1;
+    vector copy (size_with_borders, vector<char>(size_with_borders));
+
+    for(int i=0; i<size_with_borders; i++){
+        int current_line_size = (2 * size + 1) - abs(size - i);
+        for(int j=0; j<current_line_size; j++){
+            copy[i][j] = Board_vector[i][j].sign;
+        }
+    }
+
+    int temp_x, temp_y;
+    temp_x = row[0].first;
+    temp_y = row[0].second;
+    int i=1;
+
+    while(copy[temp_x][temp_y]!='_'){
+        temp_x = row[i].first;
+        temp_y = row[i].second;
+        i++;
+    }
+
+    for(int j = i-1; j>0; j--){
+        copy[row[j].first][row[j].second] = copy[row[j-1].first][row[j-1].second];
+    }
+
+    if(gameState->isWhiteTurn1()){
+        copy[row[0].first][row[0].second] = 'W';
+    }
+    else{
+        copy[row[0].first][row[0].second] = 'B';
+    }
+
+    return copy;
 }
 
 void Board::deletePawns(int k,const vector<Pawn>& pawns, bool isWhiteTurn,int which_color) {
@@ -555,4 +676,130 @@ int Board::checkBoard(int k,bool isWhiteTurn,bool delete_pawns) {
 
 bool Board::isInvalidBoard() const {
     return invalid_board;
+}
+
+int Board::genAllPosMovNums() {
+    int size_with_borders = (size + 1) * 2 - 1;
+    std::set <vector<vector<char>>> unique_states;
+    vector<std::pair<int, int>> temp_pawns;
+
+    for(int i=0; i<size_with_borders; i++){
+        int current_line_size = (2 * size + 1) - abs(size - i);
+        for(int j=0; j<current_line_size; j++){
+            if(Board_vector[i][j].sign == '+'){
+                if(i==0){
+                    if(j==0){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j+1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                    else if(j==current_line_size-1){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                    else {
+                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j+1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                }
+
+                else if(i==size_with_borders-1){
+                    if(j==0){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j+1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                    else if(j==current_line_size-1){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                    else {
+                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j+1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                }
+
+                else if(i==(size_with_borders-1)/2){
+                    if(j==0){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i,j+1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                    if(j==current_line_size-1){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i,j-1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                }
+
+                else if(i<(size_with_borders-1)/2){
+                    if(j==0){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i,j+1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j+1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                    if(j==current_line_size-1){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i,j-1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                }
+
+                else if(i>(size_with_borders-1)/2){
+                    if(j==0){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i,j+1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j+1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                    if(j==current_line_size-1){
+                        temp_pawns = getRow_by_passing_indexes(i,j,i,j-1);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j);
+                        if(!isRowFull(temp_pawns)){
+                            unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return unique_states.size();
 }
