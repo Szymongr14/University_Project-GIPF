@@ -88,7 +88,7 @@ void GameState::doMove() {
             cout<<"UNKNOWN_MOVE_DIRECTION"<<endl<<endl;
         }
         else{
-            vector <std::pair<int,int>> row = board->getRow(x,y,x1,y1);
+            vector <std::pair<int,int>> row = board->getRow((int)x,y,(int)x1,y1);
             if(board->isRowFull(row)){
                 cout<<"BAD_MOVE_ROW_IS_FULL"<<endl<<endl;
             }
@@ -110,37 +110,6 @@ void GameState::doMove() {
     }
 }
 
-int GameState::getSize() const {
-    return size;
-}
-
-void GameState::setSize(int size) {
-    GameState::size = size;
-}
-
-int GameState::getPawnsWhichTrigger() const {
-    return pawns_which_trigger;
-}
-
-void GameState::setPawnsWhichTrigger(int pawnsWhichTrigger) {
-    pawns_which_trigger = pawnsWhichTrigger;
-}
-
-int GameState::getTotalWhitePawns() const {
-    return total_white_pawns;
-}
-
-void GameState::setTotalWhitePawns(int totalWhitePawns) {
-    total_white_pawns = totalWhitePawns;
-}
-
-int GameState::getTotalBlackPawns() const {
-    return total_black_pawns;
-}
-
-void GameState::setTotalBlackPawns(int totalBlackPawns) {
-    total_black_pawns = totalBlackPawns;
-}
 
 int GameState::getWhitePawnsLeft() const {
     return white_pawns_left;
@@ -162,9 +131,6 @@ bool GameState::isWhiteTurn1() const {
     return isWhiteTurn;
 }
 
-void GameState::setIsWhiteTurn(bool isWhiteTurn) {
-    GameState::isWhiteTurn = isWhiteTurn;
-}
 
 void GameState::genAllPosMovNum() {
     cout<<board->genAllPosMovNums()<<"_UNIQUE_MOVES"<<endl;

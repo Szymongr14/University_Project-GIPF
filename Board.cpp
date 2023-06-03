@@ -106,7 +106,6 @@ void Board::setSize(int size_value) {
     Board_vector.resize(board_size+2, vector<BoardField>(board_size+2));
 }
 
-
 std::pair<int, int> Board::coordsToIndexes(char x, int y) const {
     try {
         return coords_to_indexes.at(std::to_string(x) + std::to_string(y));
@@ -193,8 +192,6 @@ bool Board::isDirectionValid(char x, int y, char x1, int y1) const{
         return true;
     }
 
-
-
     if(height_index<(size_with_borders-1)/2){
         if(width_index==0){
             if(height_index+1==height1_index && width_index+1==width1_index){
@@ -222,14 +219,23 @@ bool Board::isDirectionValid(char x, int y, char x1, int y1) const{
     return false;
 }
 
-vector<std::pair<int, int>> Board::getRow(char x, int y, char x1, int y1) const {
+vector<std::pair<int, int>> Board::getRow(int x, int y, int x1, int y1, bool raw_indexes) const {
     vector<std::pair<int, int>> row;
     int size_with_borders = (size+1)*2-1;
-    int height_index = coordsToIndexes(x,y).first;
-    int width_index = coordsToIndexes(x,y).second;
-    int height1_index = coordsToIndexes(x1,y1).first;
-    int width1_index = coordsToIndexes(x1,y1).second;
-    int temp_x=height1_index, temp_y=width1_index;
+    int height_index, width_index, height1_index, width1_index,temp_x, temp_y;
+    if(!raw_indexes){
+        height_index = coordsToIndexes((char)x,y).first;
+        width_index = coordsToIndexes((char)x,y).second;
+        height1_index = coordsToIndexes((char)x1,y1).first;
+        width1_index = coordsToIndexes((char)x1,y1).second;
+        temp_x=height1_index, temp_y=width1_index;
+    }else{
+        height_index = x;
+        width_index = y;
+        height1_index = x1;
+        width1_index = y1;
+        temp_x=height1_index, temp_y=width1_index;
+    }
 
     if(height_index+1==height1_index && width_index+1==width1_index){
         while(!Board_vector[temp_x][temp_y].border){
@@ -300,87 +306,6 @@ vector<std::pair<int, int>> Board::getRow(char x, int y, char x1, int y1) const 
 
     return row;
 }
-
-
-vector<std::pair<int, int>> Board::getRow_by_passing_indexes(int x, int y, int x1, int y1) const {
-    vector<std::pair<int, int>> row;
-    int size_with_borders = (size+1)*2-1;
-    int height_index = x;
-    int width_index = y;
-    int height1_index = x1;
-    int width1_index = y1;
-    int temp_x=height1_index, temp_y=width1_index;
-
-    if(height_index+1==height1_index && width_index+1==width1_index){
-        while(!Board_vector[temp_x][temp_y].border){
-            row.emplace_back(temp_x,temp_y);
-            if(temp_x<(size_with_borders-1)/2){
-                temp_x++;
-                temp_y++;
-            }
-            else{
-                temp_x++;
-            }
-        }
-        return row;
-    }
-    else if(height_index+1==height1_index && width_index==width1_index){
-        while(!Board_vector[temp_x][temp_y].border){
-            row.emplace_back(temp_x,temp_y);
-            if(temp_x<(size_with_borders-1)/2){
-                temp_x++;
-            }
-            else{
-                temp_x++;
-                temp_y--;
-            }
-        }
-        return row;
-    }
-    else if(height_index==height1_index && width_index+1==width1_index){
-        while(!Board_vector[temp_x][temp_y].border){
-            row.emplace_back(temp_x,temp_y);
-            temp_y++;
-        }
-        return row;
-    }
-    else if(height_index==height1_index && width_index-1==width1_index){
-        while(!Board_vector[temp_x][temp_y].border){
-            row.emplace_back(temp_x,temp_y);
-            temp_y--;
-        }
-        return row;
-    }
-    else if(height_index-1==height1_index && width_index==width1_index){
-        while(!Board_vector[temp_x][temp_y].border){
-            row.emplace_back(temp_x,temp_y);
-            if(temp_x<=(size_with_borders-1)/2){
-                temp_x--;
-                temp_y--;
-            }
-            else{
-                temp_x--;
-            }
-        }
-        return row;
-    }
-    else if(height_index-1==height1_index && width_index+1==width1_index){
-        while(!Board_vector[temp_x][temp_y].border){
-            row.emplace_back(temp_x,temp_y);
-            if(temp_x<=(size_with_borders-1)/2){
-                temp_x--;
-            }
-            else{
-                temp_x--;
-                temp_y++;
-            }
-        }
-        return row;
-    }
-
-    return row;
-}
-
 
 
 bool Board::isRowFull(const vector <std::pair<int,int>>& row) const {
@@ -689,23 +614,23 @@ int Board::genAllPosMovNums() {
             if(Board_vector[i][j].sign == '+'){
                 if(i==0){
                     if(j==0){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j+1);
+                        temp_pawns = getRow(i,j,i+1,j+1, true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
                     }
                     else if(j==current_line_size-1){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j);
+                        temp_pawns = getRow(i,j,i+1,j,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
                     }
                     else {
-                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j+1);
+                        temp_pawns = getRow(i,j,i+1,j+1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
-                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j);
+                        temp_pawns = getRow(i,j,i+1,j,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
@@ -714,23 +639,23 @@ int Board::genAllPosMovNums() {
 
                 else if(i==size_with_borders-1){
                     if(j==0){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j+1);
+                        temp_pawns = getRow(i,j,i-1,j+1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
                     }
                     else if(j==current_line_size-1){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j);
+                        temp_pawns = getRow(i,j,i-1,j,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
                     }
                     else {
-                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j+1);
+                        temp_pawns = getRow(i,j,i-1,j+1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
-                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j);
+                        temp_pawns = getRow(i,j,i-1,j,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
@@ -739,13 +664,13 @@ int Board::genAllPosMovNums() {
 
                 else if(i==(size_with_borders-1)/2){
                     if(j==0){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i,j+1);
+                        temp_pawns = getRow(i,j,i,j+1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
                     }
                     if(j==current_line_size-1){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i,j-1);
+                        temp_pawns = getRow(i,j,i,j-1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
@@ -754,21 +679,21 @@ int Board::genAllPosMovNums() {
 
                 else if(i<(size_with_borders-1)/2){
                     if(j==0){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i,j+1);
+                        temp_pawns = getRow(i,j,i,j+1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
-                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j+1);
+                        temp_pawns = getRow(i,j,i+1,j+1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
                     }
                     if(j==current_line_size-1){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i,j-1);
+                        temp_pawns = getRow(i,j,i,j-1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
-                        temp_pawns = getRow_by_passing_indexes(i,j,i+1,j);
+                        temp_pawns = getRow(i,j,i+1,j,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
@@ -777,21 +702,21 @@ int Board::genAllPosMovNums() {
 
                 else if(i>(size_with_borders-1)/2){
                     if(j==0){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i,j+1);
+                        temp_pawns = getRow(i,j,i,j+1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
-                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j+1);
+                        temp_pawns = getRow(i,j,i-1,j+1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
                     }
                     if(j==current_line_size-1){
-                        temp_pawns = getRow_by_passing_indexes(i,j,i,j-1);
+                        temp_pawns = getRow(i,j,i,j-1,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }
-                        temp_pawns = getRow_by_passing_indexes(i,j,i-1,j);
+                        temp_pawns = getRow(i,j,i-1,j,true);
                         if(!isRowFull(temp_pawns)){
                             unique_states.insert(returnCopyOfBoardAfterMove(temp_pawns));
                         }

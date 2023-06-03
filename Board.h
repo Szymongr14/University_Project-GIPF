@@ -29,7 +29,6 @@ struct Pawn {
     bool to_remove=false;
 };
 
-
 class Board {
 private:
     vector<vector<BoardField>>  Board_vector;
@@ -53,8 +52,7 @@ public:
     bool isCoordsValid(char x, int y) const;
     bool isBorder(char x, int y) const;
     bool isDirectionValid(char x, int y, char x1, int y1) const;
-    vector <std::pair<int,int>> getRow(char x, int y, char x1, int y1) const;
-    vector <std::pair<int,int>> getRow_by_passing_indexes(int x, int y, int x1, int y1) const;
+    vector <std::pair<int,int>> getRow(int x, int y, int x1, int y1,bool raw_indexes=false) const;
     bool isRowFull(const vector <std::pair<int,int>>& row) const;
     void movePawns(vector <std::pair<int,int>> row,bool isWhiteTurn);
     int checkBoard(int k,bool isWhiteTurn,bool delete_pawns = false);
