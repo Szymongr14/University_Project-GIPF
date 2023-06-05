@@ -10,6 +10,9 @@ B _ _ _ _ _ W
    W _ _ B
 
 PRINT_GAME_BOARD
+
+
+
 LOAD_GAME_BOARD
 4 4 15 15
 9 12 W

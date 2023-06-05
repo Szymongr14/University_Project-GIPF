@@ -1,11 +1,14 @@
 LOAD_GAME_BOARD
 4 4 15 15
-12 12 W
-   W _ _ B
-  _ _ _ _ _
- _ _ _ _ _ _
+6 8 B
+   W _ B _
+  _ B B W _
+ B W W W _ _
 B _ _ _ _ _ W
- _ _ _ _ _ _
-  _ _ _ _ _
-   W _ _ B
+ W B W _ _ _
+  _ W _ _ _
+   B _ _ _
+
+DO_MOVE a5-b5
+
 PRINT_GAME_BOARD
